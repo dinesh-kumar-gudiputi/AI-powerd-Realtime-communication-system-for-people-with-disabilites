@@ -1,0 +1,10 @@
+# Written by the app at runtime
+flask/image.jpg
+
+# Trained model, download it from the link in the README
+*.h5
+
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
