@@ -1,32 +1,21 @@
-<h1 align="center">Real-Time Communication System Powered by AI for the Specially Abled</h1>
+# ASL Sign Language Recognition
 
-<p align="center"><b>Webcam sign-language letter recognition (A to I) with a Keras CNN and Flask.</b></p>
+Hold up a hand sign in front of your webcam and the page shows the letter it recognises. A Keras CNN classifies the signs **A to I**, and a Flask app streams the camera with the prediction drawn on top.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?logo=tensorflow&logoColor=white" alt="TensorFlow">
-  <img src="https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white" alt="Flask">
-  <img src="https://img.shields.io/badge/OpenCV-5C3EE8?logo=opencv&logoColor=white" alt="OpenCV">
-</p>
+Project title: *Real-Time Communication System Powered by AI for the Specially Abled*
 
-A web app that reads sign-language letters from a webcam and shows the predicted letter live. A small CNN (Keras) classifies a hand sign into one of the letters **A to I**, and a Flask page streams the camera with the prediction drawn on top.
+---
 
-Letters J to Z are not supported. Several of them are gestures with movement, which a single-image classifier cannot capture.
+## Quick start
 
-## How it works
+**1. Get the model.** The trained model is not in the repo. Download it and put `asl_model.h5` into the `flask/` folder.
 
-1. The webcam frame is resized to 640 x 480 and a fixed 200 x 200 box (the region of interest) is cut out.
-2. The crop is scaled to 64 x 64 pixels and passed to the trained CNN.
-3. The predicted letter is drawn on the video stream, which Flask serves as a live feed.
+| File | Link |
+| --- | --- |
+| Model (`asl_model.h5`) | [Google Drive](https://drive.google.com/file/d/1NXq2WwmVUzNBdw3jI3yyYkK6GNv-y_AO/view?usp=drivesdk) |
+| Dataset (only needed to retrain) | [Google Drive](https://drive.google.com/drive/folders/1e8J-mUzHhPs394yFUMEDLaqbMBNemEKD) |
 
-**Model** (`notebooks/train.ipynb`): one 3 x 3 convolution layer with 32 filters, max pooling, two dense layers (300 and 150 units) and a 9-way softmax. Images are 64 x 64 RGB with rescaling, zoom and horizontal-flip augmentation. Trained for 10 epochs with the Adam optimizer. The notebook notes an accuracy of 0.863.
-
-## Run it
-
-1. Download the **model** (`asl_model.h5`) and the **dataset**, then put the model into the `flask/` folder:
-   - [Dataset](https://drive.google.com/drive/folders/1e8J-mUzHhPs394yFUMEDLaqbMBNemEKD)
-   - [Model](https://drive.google.com/file/d/1NXq2WwmVUzNBdw3jI3yyYkK6GNv-y_AO/view?usp=drivesdk)
-2. Install the requirements and start the app:
+**2. Install and run.**
 
 ```sh
 pip install -r requirements.txt
@@ -34,20 +23,54 @@ cd flask
 python app.py
 ```
 
-3. Open http://127.0.0.1:5000, click through to the live page and allow camera access. Hold your hand sign inside the box.
+**3. Open** <http://127.0.0.1:5000>, continue to the live page and allow camera access. Hold your sign inside the fixed box on the video.
 
-To retrain, point the two dataset paths in `notebooks/train.ipynb` at your copy of the dataset (they currently point to `C:/Project/datasetai/`). The notebook was written with an older TensorFlow 2 release: `fit_generator` is deprecated in current versions and `fit` replaces it.
+---
 
-## What is in the repo
+## How it works
 
-```text
-.
-├── flask/                 web app: app.py, templates, static files
-├── notebooks/             train.ipynb (training), test.ipynb (testing and webcam check)
-├── docs/project.pdf       project documentation
-└── requirements.txt
+```mermaid
+flowchart LR
+    A["Webcam frame"] --> B["Resize to 640 x 480"]
+    B --> C["Crop the 200 x 200 box<br/>at x=50, y=150"]
+    C --> D["Scale to 64 x 64"]
+    D --> E["Keras CNN"]
+    E --> F["Letter A to I"]
+    F --> G["Drawn on the frame,<br/>streamed by Flask"]
 ```
 
-## Author
+The app runs the model on every frame it sends. The crop is saved to `flask/image.jpg` before prediction (the file is git-ignored).
+
+## Model
+
+| | |
+| --- | --- |
+| Input | 64 x 64 RGB image |
+| Layers | Conv2D (32 filters, 3 x 3) → MaxPool (2 x 2) → Flatten → Dense 300 → Dense 150 → Dense 9 (softmax) |
+| Loss and optimizer | Categorical cross-entropy, Adam |
+| Training | 10 epochs, batch size 900 |
+| Augmentation | Rescale 1/255, zoom 0.2, horizontal flip |
+| Classes | A, B, C, D, E, F, G, H, I |
+
+The last cell of `notebooks/train.ipynb` carries the note *"Current accuracy is 0.863"*. That is the author's note in the notebook, not a result reproduced for this README.
+
+> [!WARNING]
+> **Known limits**
+> - Only the letters A to I. J to Z are not supported; several of them are gestures with movement, which a single-image classifier cannot capture.
+> - The hand has to be inside the fixed 200 x 200 box.
+> - The notebook is written for an older TensorFlow 2 release. `fit_generator` is deprecated; use `fit`.
+> - The dataset paths in `train.ipynb` point to `C:/Project/datasetai/`. Change them to your copy before retraining.
+
+## Files
+
+| Path | What it is |
+| --- | --- |
+| `flask/app.py` | Flask app: loads the model, reads the webcam, serves the video stream |
+| `flask/templates/` | `index1.html` (about page), `index2.html` (live recognition page) |
+| `flask/static/` | CSS and images used by the two pages |
+| `notebooks/train.ipynb` | Builds and trains the CNN, saves `asl_model.h5` |
+| `notebooks/test.ipynb` | Tests the saved model |
+| `docs/project.pdf` | Project documentation |
+| `requirements.txt` | flask, numpy, opencv-python, tensorflow |
 
 Dinesh Kumar Gudiputi, 2023
