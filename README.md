@@ -1,4 +1,13 @@
-# Real-Time Communication System Powered by AI for the Specially Abled
+<h1 align="center">Real-Time Communication System Powered by AI for the Specially Abled</h1>
+
+<p align="center"><b>Webcam sign-language letter recognition (A to I) with a Keras CNN and Flask.</b></p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?logo=tensorflow&logoColor=white" alt="TensorFlow">
+  <img src="https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white" alt="Flask">
+  <img src="https://img.shields.io/badge/OpenCV-5C3EE8?logo=opencv&logoColor=white" alt="OpenCV">
+</p>
 
 A web app that reads sign-language letters from a webcam and shows the predicted letter live. A small CNN (Keras) classifies a hand sign into one of the letters **A to I**, and a Flask page streams the camera with the prediction drawn on top.
 
